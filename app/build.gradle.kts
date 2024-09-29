@@ -50,6 +50,9 @@ android {
 }
 
 dependencies {
+    // ExoPlayer Dependencies
+    implementation(libs.exoplayer.core)
+    implementation(libs.exoplayer.ui)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
