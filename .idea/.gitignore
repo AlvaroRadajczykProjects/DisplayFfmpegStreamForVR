@@ -1,0 +1,15 @@
+*
+!*/
+
+
+# track this file
+
+
+!.gitignore
+
+
+# whitelist everything in ./config/
+
+
+!codeStyles/codeStyleConfig.xml
+!codeStyles/Project.xml
