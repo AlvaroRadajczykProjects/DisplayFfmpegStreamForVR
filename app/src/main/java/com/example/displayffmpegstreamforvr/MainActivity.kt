@@ -1,11 +1,13 @@
 package com.example.displayffmpegstreamforvr
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.TextureView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -17,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.displayffmpegstreamforvr.renderer.ReplicatingRendererFactory
@@ -91,7 +94,9 @@ class MainActivity : ComponentActivity() {
                 1020,
                 574,
                 12
-            )
+            ) {
+                startActivity(Intent(applicationContext, CameraActivity::class.java))
+            }
         }
     }
 
@@ -123,10 +128,10 @@ class MainActivity : ComponentActivity() {
 
         // Set buffer durations in milliseconds
         // maxBufferMs is max an nothing can be higher
-        val minBufferMs = 500   // Minimum buffer before playback starts
-        val maxBufferMs = 1000  // Maximum buffer during playback
-        val bufferForPlaybackMs = 250  // Buffer to start playback
-        val bufferForPlaybackAfterRebufferMs = 500  // Buffer after rebuffering
+        val minBufferMs = 100   // Minimum buffer before playback starts
+        val maxBufferMs = 200  // Maximum buffer during playback
+        val bufferForPlaybackMs = 50  // Buffer to start playback
+        val bufferForPlaybackAfterRebufferMs = 100  // Buffer after rebuffering
 
         return DefaultLoadControl.Builder().setAllocator(allocator).setBufferDurationsMs(
             minBufferMs, maxBufferMs, bufferForPlaybackMs, bufferForPlaybackAfterRebufferMs
@@ -167,14 +172,22 @@ fun UDPStreamPlayerView(
     toCopyViews: List<TextureView>,
     width: Int,
     height: Int,
-    distance: Int
+    distance: Int,
+    onDoubleTap: () -> Unit = {}
 ) {
     val sep = ceil(((distance * 1f) / 2f).toDouble()).toFloat()
     val density = LocalDensity.current
     Row(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(Color.Black)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onDoubleTap = {
+                        onDoubleTap.invoke()
+                    }
+                )
+            },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {

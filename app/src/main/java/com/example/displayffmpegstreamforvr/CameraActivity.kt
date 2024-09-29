@@ -1,5 +1,6 @@
 package com.example.displayffmpegstreamforvr
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.TextureView
 import androidx.activity.ComponentActivity
@@ -46,7 +47,9 @@ class CameraActivity : ComponentActivity() {
                 1020,
                 574,
                 12
-            )
+            ) {
+                startActivity(Intent(applicationContext, MainActivity::class.java))
+            }
         }
     }
 }
@@ -55,7 +58,8 @@ class CameraActivity : ComponentActivity() {
 fun CameraView(
     width: Int,
     height: Int,
-    distance: Int
+    distance: Int,
+    onDoubleTap: () -> Unit = {}
 ) {
     val sep = ceil(((distance * 1f) / 2f).toDouble()).toFloat()
     val density = LocalDensity.current
@@ -66,7 +70,17 @@ fun CameraView(
     Row(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(Color.Black)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        onLongPress.invoke()
+                    },
+                    onDoubleTap = {
+                        onDoubleTap.invoke()
+                    }
+                )
+            },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -75,14 +89,7 @@ fun CameraView(
             modifier = Modifier
                 .width(with(density) { width.toDp() })
                 .height(with(density) { height.toDp() })
-                .padding(end = with(density) { sep.toDp() })
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onLongPress = {
-                            onLongPress.invoke()
-                        }
-                    )
-                },
+                .padding(end = with(density) { sep.toDp() }),
             factory = { ctx ->
                 PreviewView(ctx)
             },
