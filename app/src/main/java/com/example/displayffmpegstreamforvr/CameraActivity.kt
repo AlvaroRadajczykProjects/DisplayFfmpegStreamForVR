@@ -9,6 +9,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.viewinterop.AndroidView
@@ -59,6 +61,8 @@ fun CameraView(
     val density = LocalDensity.current
     val context = LocalContext.current
 
+    var onLongPress = {}
+
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -71,7 +75,14 @@ fun CameraView(
             modifier = Modifier
                 .width(with(density) { width.toDp() })
                 .height(with(density) { height.toDp() })
-                .padding(end = with(density) { sep.toDp() }),
+                .padding(end = with(density) { sep.toDp() })
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            onLongPress.invoke()
+                        }
+                    )
+                },
             factory = { ctx ->
                 PreviewView(ctx)
             },
@@ -89,12 +100,20 @@ fun CameraView(
 
                     preview.setSurfaceProvider(view.getSurfaceProvider())
 
-                    //val camera =
+                    val camera =
                     cameraProvider.bindToLifecycle(
                         context as LifecycleOwner,
                         cameraSelector,
                         preview
                     )
+
+                    var pressState = false
+                    onLongPress = {
+                        onLongPress = {
+                            pressState = !pressState
+                            camera.cameraControl.enableTorch(pressState)
+                        }
+                    }
                 }, ContextCompat.getMainExecutor(context))
             }
         )
