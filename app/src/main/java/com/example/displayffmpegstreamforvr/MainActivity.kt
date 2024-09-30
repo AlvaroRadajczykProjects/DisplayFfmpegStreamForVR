@@ -10,7 +10,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,25 +21,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackParameters
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.UdpDataSource
+import androidx.media3.exoplayer.DefaultLivePlaybackSpeedControl
+import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.LoadControl
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.upstream.DefaultAllocator
+import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
+import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import com.example.displayffmpegstreamforvr.renderer.ReplicatingRendererFactory
 import com.example.displayffmpegstreamforvr.util.WifiUtil
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.DefaultLivePlaybackSpeedControl
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.LoadControl
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.PlaybackParameters
-import com.google.android.exoplayer2.RenderersFactory
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultAllocator
-import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy
-import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy
-import com.google.android.exoplayer2.upstream.UdpDataSource
 import kotlin.math.ceil
 
 class MainActivity : ComponentActivity() {
@@ -49,6 +47,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var drawView: TextureView
     private lateinit var toCopyViews: List<TextureView>
 
+    @UnstableApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -56,7 +55,7 @@ class MainActivity : ComponentActivity() {
         toCopyViews = listOf(TextureView(this))
 
         //Create two texture views renderer
-        val rendererFactory: RenderersFactory = ReplicatingRendererFactory(
+        val rendererFactory: ReplicatingRendererFactory = ReplicatingRendererFactory(
             this,
             drawView,
             toCopyViews
@@ -101,6 +100,7 @@ class MainActivity : ComponentActivity() {
     }
 
     // Create a custom DataSource.Factory for UdpDataSource
+    @UnstableApi
     private fun buildUdpMediaSource(url: String): MediaSource {
         // Create a custom DataSource.Factory that uses UdpDataSource
         val udpDataSourceFactory = DataSource.Factory {
@@ -122,6 +122,7 @@ class MainActivity : ComponentActivity() {
     }
 
     // Create a custom LoadControl to reduce buffering as much as possible
+    @UnstableApi
     private fun createLowBufferLoadControl(): LoadControl {
         // Create an allocator
         val allocator = DefaultAllocator(true, 16)
@@ -140,6 +141,8 @@ class MainActivity : ComponentActivity() {
             .build()
     }
 
+
+    @UnstableApi
     private fun createLivePlaybackSpeedControl(): DefaultLivePlaybackSpeedControl {
         return DefaultLivePlaybackSpeedControl.Builder()
             //.setMaxLiveOffsetErrorMsForUnitSpeed()
@@ -148,6 +151,7 @@ class MainActivity : ComponentActivity() {
             .setMinUpdateIntervalMs(66).build()
     }
 
+    @UnstableApi
     private fun createTrackSelector(): DefaultTrackSelector {
         val ts = DefaultTrackSelector(this)
         ts.setParameters(

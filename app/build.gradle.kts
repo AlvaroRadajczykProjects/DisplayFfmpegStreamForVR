@@ -51,8 +51,9 @@ android {
 
 dependencies {
     // ExoPlayer Dependencies
-    implementation(libs.exoplayer.core)
-    implementation(libs.exoplayer.ui)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.exoplayer.dash)
+    implementation(libs.androidx.media3.ui)
 
     // CameraX
     implementation(libs.androidx.camera.camera2)
